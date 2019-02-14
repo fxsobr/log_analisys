@@ -40,22 +40,22 @@ A base de dados inclui 3 tabelas:
 - Utilize o seguinte comando para conectar-se ao banco de dados
 	> psql -d news
 - Crie a view artigos_populares usando:
-	> CREATE VIEW artigos_populares as
-	SELECT art.title, COUNT(lg.path) AS views 
+	> CREATE OR REPLACE VIEW artigos_populares as
+    SELECT art.title, COUNT(lg.path) AS views 
 	FROM articles art 
-	INNER JOIN log lg ON lg.path like CONCAT ('%', art.slug, '%') 
+	INNER JOIN log lg ON lg.path like CONCAT('/article/', art.slug)
 	GROUP BY art.title 
 	ORDER BY views DESC;
 - Crie a view autores populares usando:
-	> CREATE VIEW autores_populares as
-	SELECT ath.name, COUNT(lg.path) AS views
+	> CREATE OR REPLACE VIEW autores_populares as
+    SELECT ath.name, COUNT(lg.path) AS views
 	FROM authors ath 
 	INNER JOIN articles art ON art.author = ath.id 
-	INNER JOIN log lg ON lg.path like CONCAT ('%', art.slug, '%') 
+	INNER JOIN log lg ON lg.path like CONCAT('/article/', art.slug)
 	GROUP BY ath.name 
 	ORDER BY views DESC;
 - Crie a view log_erros usando:
-	>CREATE VIEW log_erros as 
+	> CREATE OR REPLACE VIEW log_erros as 
 	SELECT TO_CHAR(time, 'DD-MM-YYYY') AS data,
 	ROUND(100.0*SUM(CASE log.status WHEN '200 OK' 
 	THEN 0 ELSE 1 END)/COUNT(log.status),2) AS percentual_erros 
